@@ -1,65 +1,63 @@
 import time
-seconds=0 
-money=0
 import random
-#money input by user
-def money_input():
-    money_input=input("Bet Amount")
-    return money_input
+seconds=0
+currentGame=""
+money=200
+gameOn=False
+symbols = ['♡','♧','♤','♢','✧',]
+
+payouts = {'♡':2,'⁠♧':3,'♤':5,'♢':10,'✧':15} 
+    
+spin_result=[]
+
+#meant to simulate odds (not actually 50/50)
+def fifty(LR):
+    LR=False
+    num=random.random()
+    if(num<.45):
+        return LR
+    else:
+        LR=True
+        return LR
+        #used for tower and sees if string is left or right or other
+def decis(string):
+    if(string.lower()=="left"):
+        return 0
+    elif(string.lower()=="right"):
+        return 1
+    else:
+        return 2
+
+#displays the games
+def back():
+    global gameOn
+    print("balance: " + "$"+ str(round(money,2)))
+    print("Games: slots, tower, cups, crash")
+    gameOn=False
+    time.sleep(.5)
+    newGame()
 
 
+#the game selector if you say yes you replay if no you go back to the games and anything else is not understood
+def selector(word):
+    if(word.lower()=="yes" and currentGame=="tower"):
+        print("Balance: "+"$"+str(round(money,2)))
+        tower()
+    elif(word.lower()=="yes" and currentGame=="crash"):
+        print("Balance: "+"$"+str(round(money,2)))
+        crash()
+    elif(word.lower()=="yes" and currentGame=="slots"):
+        print("Balance: "+"$"+str(round(money,2)))
+        spin_result=[]
+        slot_machine_game()
+    elif(word.lower()=="no"):
+        print("")
+        back()
+    else:
+        print("I couldn't quite understand could you type yes or no this time 😠")
+        selector(input())
 
-#function to count seconds and every 10 seconds it will give $10
-def count_sec():
-    global seconds,money
-    while(seconds!=12):
-        time.sleep(1)
-        seconds=seconds+1
-        if(seconds%10==0):
-            money+=10
-            seconds=0
-            print("money: " + str(money))
-count_sec()
-
-import random  # Import the random module for generating random percentages
-import time  # Import time module to add a delay between rounds
-
-def random_percent_turn(ogpercent=50, rate_decay=1.9, rounds):  
-    current_percent = ogpercent  
-    for turn in range(rounds):  # Loop through each round up to the specified number of rounds
-        if current_percent <= 0:  
-            print("Game has ended.")  #percentage reached zero
-            break  # Exit the loop if current_percent is zero or less
-
-        percent = random.randint(0, int(current_percent))  
-        print(f"Round {turn + 1} - Current random percent: {percent}%")  #current round and  percentage
-
-        current_percent -= rate_decay ** 2  
-
-        time.sleep(1)  # Pause for 1 second to simulate time between rounds
-
-
-
-def cups(number_cups):
-    while True:
-        try:
-            number_cups = int(input("Choose number of cups (2, 3, or 4): "))
-            '''there is a _ amount of cups and random percent turn makes it so that 
-            whatever number the user chooses, there is a chance the number contains a ball
-            (win) and a chance there isnt a ball(lose) and it uses the random_percent_turn
-             function to make it so the chance gets smaller and smaller each turn '''
-             choice=input("write 1,2,3 or 4")
-             if choice=True:
-            random_percent_turn()
-            
-            if number_cups in [2, 3, 4]:
-                output_mult = number_cups
-                print(f"Output multiplier is set to: {output_mult}")
-            else:
-                print("WRITE A DAMN NUMBER")
-            input(1,2,3,4)
-            
-
+#function checks to see if the input is a real number
 def isDigit(cash):
     try:
         float(cash)
@@ -67,28 +65,41 @@ def isDigit(cash):
     except ValueError:
         return False
 
+
+
+#function to count seconds and every 10 seconds it will give $10
+
+
+import random  # Import the random module for generating random percentages
+import time  # Import time module to add a delay between rounds
+
+
+
+            
+
+
+#crash game 
 def crash():
     global money
     blowout=False
     while(money>0 and blowout==False):
         print("How much would you like to spend: ")
         cash=input()
-        if not isDigit(cash):
-            print("not valid")
+        if (not isDigit(cash)or float(cash)<0):
+            print("not valid 😠")
             continue
         if(float(cash)>money):
-            print("insufficient funds")
+            print("insufficient funds 😭")
             continue
         print("when do you want to crash out: ")
         out=input()
-        if not isDigit(out):
-            print("not valid")
+        if (not isDigit(out) or float(out)<0):
+            print("not valid 😠")
             continue
         crashpercent=.00
         rand=random.random()
         percent=1.00
-        money=money-float(cash)
-        for x in range(0,2):
+        for x in range(0,3):
             rand=random.random()
             if(round(rand,2)>round(crashpercent,2)):
                 crashpercent=rand
@@ -118,25 +129,90 @@ def crash():
             if(percent>=float(out)):
                 blowout=True
                 print("Cashed out: " +str(round(new,2)))
-                money+=float(out)
+                money=money-float(cash)
+                money=money+float(new)
+                time.sleep(1)
+                print("play again? yes or no")
+                selector(input())
                 
             elif(round(crashpercent,2)>=round(crashout,2)):
                 blowout=True
                 print("Crashed out -_-")
-        
+                money=money-float(cash)
+                time.sleep(1)
+                print("play again? yes or no")
+                selector(input())
 
-        
-        
 
-#tower game
-def tower(money_input):
-    multiplier=1.25
-    total_Earnings=0
-    level=0
-    resultsList=[]
-    for i in range(0,9):
-        randomNumberTower=random.randint(1,2)
-        resultsList.append(randomNumberTower)
+
+
+
+
+def tower():
+    global money
+    fail=False
+    while(money>0 and fail!=True):
+        print("How much would you like to spend: ")
+        cash=input()
+        if (not isDigit(cash)or float(cash)<0):
+            print("not valid 😠")
+            continue
+        if(float(cash)>money):
+            print("insufficient funds 😭")
+            continue
+        trials=0
+        tow=[]
+        col=[]
+        tempnum=7
+        out=""
+        for num in range(7,0,-1):
+            tow.append([round(float(cash)*(1.5**num),2)])
+            tow.append([round(float(cash)*(1.5**num),2)])
+            col.append(tow)
+            tow=[]
+        for x in range(len(col)):
+            print(col[x])
+        while(fail==False):
+            if(trials==0):
+                print("Left or Right")
+            else:
+                print("Left, Right, or stop")
+            decision=input()
+            print("")
+            print("")
+            temp=decis(decision)
+            if(decision.lower()=="stop"and trials>=1):
+                print("Cashed out $"+str(out))
+                money=round(money-float(cash),2)
+                money=round(money+float(out),2)
+                print("play again? yes or no")
+                selector(input())
+            if(decis(decision)==2 and trials==0):
+                print("ENTER LEFT OR RIGHT 😡")
+                continue
+            elif(decis(decision)==2):
+                print("ENTER LEFT, RIGHT, OR STOP")
+                continue
+            if(fifty(decision)==True):
+                tempnum=tempnum-1
+            else:
+                col[tempnum-1][temp]="X"
+                for x in range(len(col)):
+                    print(col[x])
+                print("")
+                print("")
+                print("yikes you lose 😭")
+                money=round(money-float(cash),2)
+                time.sleep(.3)
+                print("play again? yes or no")
+                selector(input())
+            out=str(col[tempnum][temp])[1:-1]
+            col[tempnum][temp]="✔"
+            for x in range(len(col)):
+                print(col[x])
+            trials=trials+1
+            
+    
     
 
 
@@ -149,34 +225,53 @@ payouts = {'♡':2,'⁠♧':3,'♤':5,'♢':10,'✧':15}
 
 
 def slot_machine_game() :
-
-    
-
+    global money,spin_result
+    savespin=[]
 
     def spin_slot_symbols() :
-
-        return [random.choice(symbols) for sym in range(3)]
-
-    def display_spin(spin_result):
-
+        print("")
+        time.sleep(.5)
         print("watashi wasta es spinning")
-        print(f"{spin_result[0] | spin_result[1] | spin_result[2]}")
+        print("")
+        for y in range(0,3):
+            spin_result=[]
+            for x in range(0,3):
+                spin_result.append(random.choice(symbols))
+            time.sleep(.5)
+            print(spin_result)
+            savespin.append(spin_result[y])
+        print("")
+        time.sleep(1)
+        print("Final Result")
+        print(savespin)
+        time.sleep(1)
+        return savespin
+
+    
 
     def check_win(spin_result, bet_amount):
 
-        if len(set(spin_result)) == 1 :
-            symbol = spin_result[0]
-        if symbol in payouts:
-            payout = bet_amount * payouts[symbol]
-            return payout
-        return 0
+        if(savespin[0]==savespin[1]==savespin[2]):
+            if(savespin[0]=="♡"):
+                return bet*2
+            elif(savespin[0]=="⁠♧"):
+                return bet*3
+            elif(savespin[0]=="♤"):
+                return bet*5
+            elif(savespin[0]=="♢"):
+                return bet*10
+            elif(savespin[0]=="✧"):
+                return bet*15
+        else:
+            return 0
+        
     
 
 
-print("Welcome to slot tuah spin that thang")
+    print("Welcome to slot tuah spin that thang")
 
 
-while True:
+    while True:
         try:
             bet = int(input("Enter your bet amount: $"))
             if bet <= 0:
@@ -185,6 +280,23 @@ while True:
                 break
         except ValueError:
             print("Invalid input. Please enter a valid number for your bet.")
+    spin_slot_symbols()
+    winnings=check_win(savespin,bet)
+    if(winnings==0):
+        time.sleep(.5)
+        print("You Lose!")
+        money=money-bet
+        time.sleep(.4)
+        print("play again? yes or no")
+        selector(input())
+    else:
+        time.sleep(.5)
+        print("Wow you actually won $"+str(winnings))
+        money=money-bet
+        money=money+winnings
+        time.sleep(.4)
+        print("play again? yes or no")
+        selector(input())
     
 
     
@@ -202,6 +314,24 @@ while True:
 
 
 
+print("Welcome to gulp gulp casinos what would you like to play")
+print("we have slots, tower, cups, and crash")
 
 
-
+def newGame():
+    global gameOn,currentGame
+    while(gameOn==False):
+        game=input("Enter a game: ")
+        if(game.lower()=="crash"):
+            currentGame="crash"
+            gameOn=True
+            crash()
+        elif(game.lower()=="tower" or game.lower()=="towers"):
+            currentGame="tower"
+            gameOn=True
+            tower()
+        elif(game.lower()=="slot" or game.lower()=="slots"):
+            currentGame="slots"
+            gameOn=True
+            slot_machine_game()
+newGame()
