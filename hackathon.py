@@ -32,7 +32,7 @@ def decis(string):
 def back():
     global gameOn
     print("balance: " + "$"+ str(round(money,2)))
-    print("Games: slots, tower, cups, crash")
+    print("Games: slots, tower, crash")
     gameOn=False
     time.sleep(.5)
     newGame()
@@ -128,7 +128,7 @@ def crash():
             print("$"+str(round(new,2)))
             if(percent>=float(out)):
                 blowout=True
-                print("Cashed out: " +str(round(new,2)))
+                print("Cashed out: $" +str(round(new,2)))
                 money=money-float(cash)
                 money=money+float(new)
                 time.sleep(1)
@@ -213,14 +213,14 @@ def tower():
             trials=trials+1
             
     
+
+                    
+   #rip cups                 
+
     
 
 
 
-symbols = ['♡','♧','♤','♢','✧',]
-
-payouts = {'♡':2,'⁠♧':3,'♤':5,'♢':10,'✧':15} 
-    
 
 
 
@@ -315,7 +315,7 @@ def slot_machine_game() :
 
 
 print("Welcome to gulp gulp casinos what would you like to play")
-print("we have slots, tower, cups, and crash")
+print("we have slots, tower, and crash")
 
 
 def newGame():
